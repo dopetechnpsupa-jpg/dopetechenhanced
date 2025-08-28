@@ -1245,7 +1245,38 @@ body *::-webkit-scrollbar-thumb:hover {
 
 /* Optimized gradients */
 .gradient-bg {
-  background: linear-gradient(135deg, #000000 0%, #1a1a1a 30%, #1a1a0a 50%, #1a1a1a 70%, #000000 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(47, 27, 20, 0.85) 20%, rgba(139, 69, 19, 0.8) 40%, rgba(184, 134, 11, 0.75) 60%, rgba(230, 200, 0, 0.7) 80%, rgba(247, 221, 15, 0.65) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Enhanced frosted glass effects */
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.frosted-glass-strong {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.frosted-glass-yellow {
+  background: rgba(247, 221, 15, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(247, 221, 15, 0.3);
+}
+
+.frosted-glass-yellow-hover:hover {
+  background: rgba(247, 221, 15, 0.25);
+  border-color: rgba(247, 221, 15, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(247, 221, 15, 0.2);
 }
 
 .gradient-bg-dopetech {

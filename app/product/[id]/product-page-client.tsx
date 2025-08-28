@@ -63,8 +63,8 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
                          <Button
                variant="ghost"
                onClick={() => {
-                 // Navigate with a parameter to skip loading screen
-                 router.push('/?fromProduct=true', { scroll: false })
+                 // Navigate back to home page
+                 router.push('/', { scroll: false })
                }}
                className="flex items-center gap-2 p-3 text-white hover:bg-[#F7DD0F]/10 hover:text-[#F7DD0F] transition-all duration-300 rounded-xl"
              >

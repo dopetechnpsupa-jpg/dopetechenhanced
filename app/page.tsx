@@ -33,6 +33,7 @@ import {
   Monitor,
   ChevronDown,
   Edit,
+  Sparkles,
 } from "lucide-react"
 // Removed CursorTracker (opt-in effect)
 import LazyAIChat from "@/components/lazy-ai-chat"
@@ -42,6 +43,7 @@ import { getCategories, syncCategoriesWithDatabase } from "@/lib/categories-data
 import { useCart } from "@/contexts/cart-context"
 import { CartItemEditor } from "@/components/cart-item-editor"
 import { supabase } from "@/lib/supabase"
+import { DopeDailyShowcase } from "@/components/dope-daily-showcase"
 
 // Client-side only component to prevent hydration mismatches
 const ClientOnly = ({ children, fallback = null }: { children: React.ReactNode, fallback?: React.ReactNode }) => {
@@ -281,7 +283,7 @@ export default function DopeTechEcommerce() {
   const { isLoading: isDataLoading, withLoading } = useLoadingState()
   
   // Splash screen state
-  const [showSplash, setShowSplash] = useState(true)
+  const [showSplash, setShowSplash] = useState(false) // Start as false
   const [isAppReady, setIsAppReady] = useState(false)
 
   const [editingCartItem, setEditingCartItem] = useState<number | null>(null)
@@ -345,20 +347,20 @@ export default function DopeTechEcommerce() {
     setIsAppReady(true)
   }, [])
 
-  // Check if coming from product page to skip splash screen
+  // Check if this is the first visit to show splash screen
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
-      const fromProduct = urlParams.get('fromProduct')
+      const hasVisitedBefore = localStorage.getItem('dopetech-has-visited')
       
-      if (fromProduct === 'true') {
-        // Skip splash screen when coming from product page
+      if (!hasVisitedBefore) {
+        // First time visitor - show splash screen
+        setShowSplash(true)
+        // Mark as visited
+        localStorage.setItem('dopetech-has-visited', 'true')
+      } else {
+        // Returning visitor - skip splash screen
         setShowSplash(false)
         setIsAppReady(true)
-        
-        // Clean up the URL parameter
-        const newUrl = window.location.pathname
-        window.history.replaceState({}, '', newUrl)
       }
     }
   }, [])
@@ -1448,9 +1450,9 @@ export default function DopeTechEcommerce() {
             </div>
 
             {/* Dope Picks Section - Mobile Optimized Spacing */}
-            <div className="w-full mx-auto mt-1 sm:mt-6 mb-2 sm:mb-12 animate-fade-in-up stagger-4">
-              <div className="text-center mb-2 sm:mb-8 px-2 sm:px-4">
-                                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-4xl text-kelpt-a2 text-white mb-1 sm:mb-3 text-shadow">
+            <div className="w-full mx-auto mt-1 sm:mt-6 mb-4 sm:mb-12 animate-fade-in-up stagger-4">
+              <div className="text-center mb-3 sm:mb-8 px-2 sm:px-4">
+                                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-4xl text-kelpt-a2 text-white mb-3 sm:mb-4 text-shadow">
                    Dope <span className="text-gradient">Picks</span>
                  </h2>
                 <p className="text-base sm:text-lg md:text-xl lg:text-lg xl:text-lg text-gray-300 font-medium">
@@ -1470,85 +1472,18 @@ export default function DopeTechEcommerce() {
               />
             </div>
             
-            {/* Daily Advertisement Banner */}
-            {dailyAdProduct && (
-              <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-10 mx-2 sm:mx-4 md:mx-6 lg:mx-8">
-                <div 
-                  className="relative bg-gradient-to-r from-[#F7DD0F] to-[#FFE55C] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl hover:shadow-[#F7DD0F]/30 transition-all duration-500 hover:scale-[1.02] cursor-pointer group"
-                  onClick={() => router.push(`/product/${dailyAdProduct.id}`)}
-                >
-                  {/* Banner Content */}
-                  <div className="relative min-h-[180px] sm:min-h-[200px] md:min-h-[250px] lg:min-h-[300px] xl:min-h-[350px] flex items-center">
-                    
-                    {/* Left Side - Product Image */}
-                    <div className="absolute left-0 top-0 w-1/2 h-full flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
-                      <div className="relative w-full h-full max-w-xs sm:max-w-sm bg-white rounded-lg sm:rounded-2xl shadow-lg sm:shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                        <img
-                          src={getPrimaryImageUrl(dailyAdProduct)}
-                          alt={dailyAdProduct.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/products/placeholder.png';
-                          }}
-                        />
-                        
-                        {/* Discount Badge */}
-                        {dailyAdProduct.discount > 0 && (
-                          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-red-500 text-white text-xs sm:text-sm md:text-base font-bold px-2 py-1 sm:px-3 sm:py-2 rounded-full shadow-lg animate-pulse">
-                            -{dailyAdProduct.discount}% OFF
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Right Side - Product Info */}
-                    <div className="absolute right-0 top-0 w-1/2 h-full flex flex-col justify-center p-2 sm:p-4 md:p-6 lg:p-8 xl:p-12">
-                      <div className="text-black">
-                        {/* Daily Special Tag */}
-                        <div className="inline-flex items-center bg-black text-[#F7DD0F] px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-bold mb-1 sm:mb-2 md:mb-4 animate-fade-in-up">
-                          🌟 Dope Daily Picks
-                        </div>
-                        
-                        {/* Product Name */}
-                        <h2 className="text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold mb-1 sm:mb-2 md:mb-4 leading-tight animate-fade-in-up line-clamp-2" style={{ animationDelay: '0.2s' }}>
-                          {dailyAdProduct.name}
-                        </h2>
-                        
-                        {/* Product Description - Hidden on very small screens */}
-                        <p className="hidden sm:block text-xs sm:text-sm md:text-base text-black/80 mb-2 sm:mb-3 md:mb-6 line-clamp-2 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                          {dailyAdProduct.description}
-                        </p>
-                        
-                        {/* Price */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-4 mb-2 sm:mb-4 md:mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-                          <span className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-black">
-                            Rs {dailyAdProduct.discount > 0 ? Math.round(dailyAdProduct.original_price * (1 - dailyAdProduct.discount / 100)).toLocaleString() : dailyAdProduct.price.toLocaleString()}
-                          </span>
-                          {(dailyAdProduct.original_price > dailyAdProduct.price || dailyAdProduct.discount > 0) && (
-                            <span className="text-xs sm:text-sm md:text-base text-black/60 line-through">
-                              Rs {dailyAdProduct.original_price.toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {/* CTA Button */}
-                        <button className="bg-black text-[#F7DD0F] px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-8 lg:py-4 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-base lg:text-lg hover:bg-black/90 transition-all duration-300 shadow-lg hover:shadow-xl animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-                          Shop Now →
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Background Pattern/Texture */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#F7DD0F]/5 to-transparent opacity-50 pointer-events-none"></div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Enhanced Dope Daily Picks Section */}
+            <div className="mt-3 sm:mt-6 mb-2 sm:mb-12 mx-2 sm:mx-4 md:mx-6 lg:mx-8 animate-fade-in-up stagger-5">
+              <DopeDailyShowcase 
+                products={products}
+                onAddToCart={handleAddToCartWithTracking}
+                className="w-full"
+              />
+            </div>
 
             {/* Dope Categories Header - Mobile Optimized Spacing */}
             <div className="text-center mb-4 sm:mb-4 animate-fade-in-up stagger-4 px-2 sm:px-4">
-                                                             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-4xl text-kelpt-a2 text-white mb-1 sm:mb-3 text-shadow">
+                                                             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-4xl text-kelpt-a2 text-white mb-3 sm:mb-4 text-shadow">
                    Dope <span className="text-gradient">Categories</span>
                  </h2>
               <p className="text-base sm:text-lg md:text-xl lg:text-lg xl:text-lg text-gray-300 font-medium">
@@ -1557,7 +1492,7 @@ export default function DopeTechEcommerce() {
             </div>
 
                          {/* Category Filter - Mobile Optimized Spacing */}
-             <div ref={categorySectionRef} className="mb-2 sm:mb-12 animate-fade-in-up stagger-5">
+             <div ref={categorySectionRef} className="mb-3 sm:mb-12 animate-fade-in-up stagger-5">
                {/* Horizontal Scroll Layout for Mobile, Flex Wrap for Desktop */}
                <div className="flex overflow-x-auto scrollbar-hide gap-2 sm:gap-3 sm:flex-wrap sm:justify-center w-full px-4">
                  {categories.map((category, index) => (
@@ -1590,7 +1525,7 @@ export default function DopeTechEcommerce() {
                      {/* Products Grid - Uniform Sizing */}
                        <div 
               data-products-section
-              className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 mt-4 sm:mt-8 md:mt-10 lg:mt-12 cv-auto ${
+              className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 mt-3 sm:mt-8 md:mt-10 lg:mt-12 cv-auto ${
                 viewMode === "grid" 
                   ? "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6" 
                   : "grid-cols-1"
@@ -1691,17 +1626,15 @@ export default function DopeTechEcommerce() {
 
       {/* Dope Arrivals Section */}
       {Object.keys(dopeArrivals).length > 0 && (
-        <section className="py-6 sm:py-8 md:py-10 lg:py-12 overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #F7DD0F 0%, #FFE55C 50%, #F7DD0F 100%)' }}>
+        <section className="py-6 sm:py-8 md:py-10 lg:py-12 overflow-hidden relative" style={{ background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(230, 200, 0, 0.8) 50%, rgba(247, 221, 15, 0.7) 100%)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
           <div className="container-full">
             <div className="w-full mx-auto animate-fade-in-up">
               {/* Section Header */}
-              <div className="text-center mb-6 sm:mb-8 md:mb-10 px-2 sm:px-4">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl text-black mb-2 sm:mb-3 md:mb-4 text-shadow font-bold">
-                  Recent <span className="text-black font-extrabold">Dope Drops</span>
-                </h2>
-                <p className="text-base sm:text-lg md:text-xl text-black/80 font-medium">
-                  Fresh tech by categories
-                </p>
+              <div className="text-center mb-4 sm:mb-8 md:mb-10 px-2 sm:px-4">
+                <div className="inline-flex items-center gap-3 bg-black text-[#F7DD0F] px-6 py-3 rounded-full text-base sm:text-lg font-bold shadow-xl">
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+                  ★ Recent Dope Drops
+                </div>
               </div>
 
               {/* Categories Grid */}
@@ -1805,7 +1738,7 @@ export default function DopeTechEcommerce() {
             </div>
 
             {/* Yellow Box Container - Products Only */}
-            <div className="bg-[#F7DD0F] border-2 border-[#F7DD0F] rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 mx-2 sm:mx-4 md:mx-8 lg:mx-12">
+            <div className="bg-gradient-to-b from-black/90 via-[#E6C800]/80 to-[#F7DD0F]/70 rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 mx-2 sm:mx-4 md:mx-8 lg:mx-12 backdrop-blur-xl">
             
             {/* Product Grid - Images and Text Combined */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12 xl:gap-16 mx-auto px-4 max-w-7xl">
@@ -2164,4 +2097,6 @@ export default function DopeTechEcommerce() {
       )}
     </>
   )
-}
+} 
+ 
+ 
