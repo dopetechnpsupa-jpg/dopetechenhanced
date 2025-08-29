@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { useMarqueeControl } from '@/hooks/useMarqueeControl';
 import type { Product } from '@/lib/products-data';
@@ -23,6 +24,8 @@ export const DraggableMarquee: React.FC<DraggableMarqueeProps> = ({
   pauseOnHover = true,
   showScrollHint = true
 }) => {
+  const router = useRouter();
+  
   // Function to generate exactly 10 unique items for the marquee
   const generateMarqueeItems = () => {
     if (products.length === 0) return [];
@@ -192,7 +195,10 @@ export const DraggableMarquee: React.FC<DraggableMarqueeProps> = ({
               key={product.uniqueKey} 
               className="group relative flex-shrink-0"
             >
-              <div className="relative overflow-hidden rounded-2xl w-40 h-32 sm:w-48 sm:h-36 md:w-56 md:h-40 bg-gradient-to-br from-white/5 to-white/10 border border-white/10 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div 
+                className="relative overflow-hidden rounded-2xl w-40 h-32 sm:w-48 sm:h-36 md:w-56 md:h-40 bg-gradient-to-br from-white/5 to-white/10 border border-white/10 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer"
+                onClick={() => router.push(`/product/${product.id}`)}
+              >
                 <img
                   src={getPrimaryImageUrl(product)}
                   alt={product.name}
@@ -231,7 +237,10 @@ export const DraggableMarquee: React.FC<DraggableMarqueeProps> = ({
               key={`duplicate-${product.uniqueKey}`} 
               className="group relative flex-shrink-0"
             >
-              <div className="relative overflow-hidden rounded-2xl w-40 h-32 sm:w-48 sm:h-36 md:w-56 md:h-40 bg-gradient-to-br from-white/5 to-white/10 border border-white/10 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div 
+                className="relative overflow-hidden rounded-2xl w-40 h-32 sm:w-48 sm:h-36 md:w-56 md:h-40 bg-gradient-to-br from-white/5 to-white/10 border border-white/10 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer"
+                onClick={() => router.push(`/product/${product.id}`)}
+              >
                 <img
                   src={getPrimaryImageUrl(product)}
                   alt={product.name}

@@ -40,7 +40,7 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
   const [orderConfirmed, setOrderConfirmed] = useState(false)
   const [orderId, setOrderId] = useState('')
   const [currentStep, setCurrentStep] = useState<'customer-info' | 'payment-selection' | 'payment' | 'confirmation'>('customer-info')
-  const [paymentOption, setPaymentOption] = useState<'full' | 'cod'>('full')
+  const [paymentOption, setPaymentOption] = useState<'full' | 'deposit'>('full')
   const [receiptFile, setReceiptFile] = useState<File | null>(null)
   const [receiptFileName, setReceiptFileName] = useState('')
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false)
@@ -59,14 +59,22 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
     if (isOpen) {
       setShouldRender(true)
       setIsClosing(false)
+      // Lock body scroll when modal is open
+      document.body.style.overflow = 'hidden'
       return
     }
     setIsClosing(true)
+    // Restore body scroll when modal is closed
+    document.body.style.overflow = 'unset'
     const timeout = setTimeout(() => {
       setShouldRender(false)
       setIsClosing(false)
     }, 220)
-    return () => clearTimeout(timeout)
+    return () => {
+      clearTimeout(timeout)
+      // Ensure body scroll is restored on cleanup
+      document.body.style.overflow = 'unset'
+    }
   }, [isOpen])
 
   const NEPAL_PHONE_REGEX = /^\+977\d{8,10}$/
@@ -148,8 +156,8 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
         cart,
         total: finalTotal,
         paymentOption,
-        receiptFile: receiptFile ? await fileToBase64(receiptFile) : null,
-        receiptFileName: receiptFileName || null
+        receiptFile: receiptFile ? await fileToBase64(receiptFile) : undefined,
+        receiptFileName: receiptFileName || undefined
       }
 
       console.log('📋 Submitting order to Supabase:', {
@@ -202,7 +210,7 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
     
     if (currentStep === 'payment-selection') {
       // If Cash on Delivery is selected, skip payment step and submit order directly
-      if (paymentOption === 'cod') {
+      if (paymentOption === 'deposit') {
         console.log('Cash on Delivery selected, proceeding with order submission...')
         try {
           console.log('Starting Supabase checkout submission for COD...')
@@ -284,8 +292,8 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
   // Order Confirmation Screen
   if (orderConfirmed) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-white/20 gradient-bg">
+      <div className="fixed inset-0 z-50 flex items-start justify-center p-4 backdrop-blur-sm bg-black/50 overflow-y-auto">
+        <div className="bg-black rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-white/20 my-4">
           <div className="p-6 text-center">
             {/* Animated Checkmark */}
             <div className="mb-4 flex justify-center">
@@ -328,8 +336,8 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50">
-      <div className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-6xl overflow-hidden border border-white/20 gradient-bg transition-all duration-300 ${
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 backdrop-blur-sm bg-black/50 overflow-y-auto">
+      <div className={`bg-black rounded-2xl shadow-2xl w-full max-w-6xl overflow-hidden border border-white/20 transition-all duration-300 my-4 ${
         isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
       }`}>
         {/* Header */}
@@ -536,9 +544,9 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
                       <input
                         type="radio"
                         name="paymentOption"
-                        value="cod"
-                        checked={paymentOption === 'cod'}
-                        onChange={(e) => setPaymentOption(e.target.value as 'full' | 'cod')}
+                        value="deposit"
+                        checked={paymentOption === 'deposit'}
+                        onChange={(e) => setPaymentOption(e.target.value as 'full' | 'deposit')}
                         className="w-5 h-5 text-[#F7DD0F] border-white/30 rounded focus:ring-[#F7DD0F] bg-white/5"
                       />
                       <div className="flex-1">
@@ -701,7 +709,7 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
                     <span className="text-white">Total:</span>
                     <span className="text-[#F7DD0F]">Rs {finalTotal.toLocaleString()}</span>
                   </div>
-                  {paymentOption === 'cod' && (
+                  {paymentOption === 'deposit' && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Pay on Delivery:</span>
                       <span className="text-[#F7DD0F] font-semibold">Rs {codAmount.toLocaleString()}</span>
@@ -725,7 +733,7 @@ export default function SupabaseCheckout({ isOpen, onClose, cart, total, onCartR
                   ) : currentStep === 'customer-info' ? (
                     'Continue to Payment'
                   ) : currentStep === 'payment-selection' ? (
-                    paymentOption === 'cod' ? 'Confirm Order' : 'Continue to Payment'
+                    paymentOption === 'deposit' ? 'Confirm Order' : 'Continue to Payment'
                   ) : (
                     'Confirm Order'
                   )}

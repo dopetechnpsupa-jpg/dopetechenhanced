@@ -1502,7 +1502,7 @@ body *::-webkit-scrollbar-thumb:hover {
   
   /* Enhanced Typography */
   .text-gradient {
-    background: linear-gradient(135deg, #F7DD0F, #FFD700, #FFF9C4);
+    background: linear-gradient(135deg, #FFFF00, #FFD700, #FFEB3B, #FFF176);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -2605,6 +2605,22 @@ main::-webkit-scrollbar {
 .ai-chat-assistant {
   position: fixed !important;
   z-index: 9999;
+}
+
+/* AI Chat Toggle Button - Ensure it always floats */
+.ai-chat-toggle-button {
+  position: fixed !important;
+  z-index: 9999 !important;
+  bottom: 24px !important;
+  left: 16px !important;
+  pointer-events: auto !important;
+}
+
+@media (min-width: 768px) {
+  .ai-chat-toggle-button {
+    bottom: 32px !important;
+    left: 24px !important;
+  }
 }
 
 /* Prevent viewport shift on mobile when keyboard appears */

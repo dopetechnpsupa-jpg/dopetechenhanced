@@ -1456,7 +1456,7 @@ body *::-webkit-scrollbar-thumb:hover {
   
   /* Enhanced Typography */
   .text-gradient {
-    background: linear-gradient(135deg, #F7DD0F, #FFD700, #FFF9C4);
+    background: linear-gradient(135deg, #FFFF00, #FFD700, #FFEB3B, #FFF176);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -277,8 +277,18 @@ export default function AIChatAssistant({ products, onAddToCart }: AIChatAssista
       {/* Mobile Chat Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 left-4 md:bottom-8 md:left-6 z-50 frosted-glass-yellow frosted-glass-yellow-hover text-black p-4 rounded-full touch-manipulation flex items-center justify-center shadow-lg"
-        style={{ minHeight: '56px', minWidth: '56px', maxWidth: '56px', maxHeight: '56px' }}
+        className="ai-chat-toggle-button fixed bottom-6 left-4 md:bottom-8 md:left-6 z-[9999] frosted-glass-yellow frosted-glass-yellow-hover text-black p-4 rounded-full touch-manipulation flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105"
+        style={{ 
+          minHeight: '56px', 
+          minWidth: '56px', 
+          maxWidth: '56px', 
+          maxHeight: '56px',
+          position: 'fixed',
+          bottom: '24px',
+          left: '16px',
+          zIndex: 9999,
+          pointerEvents: 'auto'
+        }}
         aria-label="Open AI Chat Assistant"
       >
         {isOpen ? <X className="w-5 h-5 block text-[#F7DD0F]" /> : <MessageCircle className="w-5 h-5 block text-[#F7DD0F]" />}
